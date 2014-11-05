@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact name="in360TourBuilder:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/in360TourBuilder_jar</output-path>
+    <root id="root">
+      <element id="archive" name="in360TourBuilder.jar">
+        <element id="module-output" name="in360TourBuilder" />
+      </element>
+      <element id="library" level="project" name="commons-io-2.4" />
+      <element id="library" level="project" name="thumbnailator-0.4.7" />
+      <element id="library" level="project" name="metadata-extractor-2.6.4" />
+      <element id="library" level="project" name="commons-net-3.3" />
+      <element id="library" level="project" name="xmpcore" />
+      <element id="library" level="project" name="jai_codec" />
+      <element id="library" level="project" name="jai_core" />
+    </root>
+  </artifact>
+</component>

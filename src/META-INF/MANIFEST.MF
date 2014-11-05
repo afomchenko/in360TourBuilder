@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Class-Path: commons-io-2.4.jar thumbnailator-0.4.7.jar metadata-extrac
+ tor-2.6.4.jar commons-net-3.3.jar xmpcore.jar jai_codec.jar jai_core.
+ jar
+Main-Class: ru.in360.Main
+
