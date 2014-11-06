@@ -121,6 +121,8 @@ public class PanoCollection implements Serializable {
             Scene sc = pano.getScene();
             Map<Integer, Integer> nearestPanos = getNearest(pano);
 
+            sc.getSceneHotspots().clear();
+
             int i = 0;
             for (Map.Entry<Integer, Integer> entry : nearestPanos.entrySet()) {
                 if (i > 4) break;
