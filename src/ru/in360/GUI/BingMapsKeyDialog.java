@@ -31,43 +31,26 @@
  *    вместе с этой программой. Если это не так, см.
  *    <http://www.gnu.org/licenses/>.
  *
- * 06.11.14 1:47 Anton Fomchenko 360@in360.ru
+ * 06.11.14 3:29 Anton Fomchenko 360@in360.ru
  */
-
 
 package ru.in360.GUI;
 
-
-import ru.in360.FTPUploader;
 import ru.in360.TourProject;
 
 import javax.swing.*;
 import java.awt.event.*;
 
-public class FTPSettings extends JDialog {
-    static ProgressMonitor pbar;
-    static Timer timer;
+public class BingMapsKeyDialog extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField ipField;
-    private JTextField tcpField;
-    private JTextField userField;
-    private JPasswordField passwordField;
-    private JTextField remoteDirField;
+    private JTextField bingMapsKeyField;
 
-    public FTPSettings() {
+    public BingMapsKeyDialog() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-
-        FTPUploader ftp = TourProject.getInstance().getFtpUploader();
-
-        ipField.setText(ftp.getServer());
-        tcpField.setText(Integer.toString(ftp.getPort()));
-        userField.setText(ftp.getUser());
-        passwordField.setText(ftp.getPass());
-        remoteDirField.setText(ftp.getRemoteProject());
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -95,67 +78,19 @@ public class FTPSettings extends JDialog {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
         setLocationRelativeTo(null);
         pack();
         setVisible(true);
     }
 
     private void onOK() {
-        FTPUploader ftp = TourProject.getInstance().getFtpUploader();
-        try {
-            ftp.setServer(ipField.getText());
-            ftp.setPort(Integer.parseInt(tcpField.getText()));
-            ftp.setUser(userField.getText());
-            ftp.setPass(String.valueOf(passwordField.getPassword()));
-            ftp.setRemoteProject(remoteDirField.getText());
-
-            pbar = new ProgressMonitor(this, "Upload Progress", "Initializing . . .", 0, 100);
-            timer = new Timer(1000, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    SwingUtilities.invokeLater(new Update());
-                }
-            });
-            timer.start();
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    TourProject.getInstance().uploadToFTP();
-                    timer.stop();
-                    pbar.close();
-                }
-            }).start();
-
-
-        } catch (IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
-        }
+        TourProject.getInstance().setBingMapsKey(bingMapsKeyField.getText());
         dispose();
     }
 
     private void onCancel() {
 // add your code here if necessary
         dispose();
-    }
-
-
-    private class Update implements Runnable {
-
-        public void run() {
-
-            if (pbar.isCanceled()) {
-
-                pbar.close();
-                // dispose();
-            }
-
-            pbar.setProgress(TourProject.getInstance().getComplete());
-
-            pbar.setNote("Uploading is " + TourProject.getInstance().getComplete() + "% complete");
-
-        }
     }
 
 

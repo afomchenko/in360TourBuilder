@@ -37,26 +37,80 @@
 
 package ru.in360.GUI;
 
+import ru.in360.FileUtils;
+import ru.in360.TourProject;
+
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.*;
+import java.io.File;
 
 public class TourSettings extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField textField1;
-    private JButton button1;
-    private JTextField textField2;
-    private JButton button2;
-    private JTextField textField3;
-    private JButton button3;
-    private JTextField textField4;
-    private JButton button4;
+    private JTextField jsField;
+    private JButton jsButton;
+    private JTextField swfField;
+    private JButton swfButton;
+    private JTextField skinField;
+    private JButton skinButton;
+    private JTextField bingField;
+    private JTextField projectField;
+
+    private JFileChooser projectFolderChooser;
+    private JFileChooser skinFolderChooser;
+    private JFileChooser pluginsFolderChooser;
+    private JFileChooser jsFileChooser;
+    private JFileChooser swfFileChooser;
+
+    TourProject project;
 
     public TourSettings() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
+
+        project = TourProject.getInstance();
+
+        projectField.setText(project.getProjectFolder().getPath());
+        bingField.setText(project.getBingMapsKey());
+        jsField.setText(project.getViewerJsFile().getPath());
+        swfField.setText(project.getViewerSwfFile().getPath());
+        skinField.setText(project.getSkinFolder().getPath());
+
+        FileFilter jsFilter = new FileNameExtensionFilter("JavaScript", "js");
+        FileFilter swfFilter = new FileNameExtensionFilter("Flash", "swf");
+
+        projectFolderChooser = new JFileChooser();
+        projectFolderChooser.setCurrentDirectory(new java.io.File("."));
+        projectFolderChooser.setDialogTitle("Select project folder");
+        projectFolderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        projectFolderChooser.setAcceptAllFileFilterUsed(false);
+
+        skinFolderChooser = new JFileChooser();
+        skinFolderChooser.setCurrentDirectory(new java.io.File("."));
+        skinFolderChooser.setDialogTitle("Select skin folder");
+        skinFolderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        skinFolderChooser.setAcceptAllFileFilterUsed(false);
+
+        pluginsFolderChooser = new JFileChooser();
+        pluginsFolderChooser.setCurrentDirectory(new java.io.File("."));
+        pluginsFolderChooser.setDialogTitle("Select plugins folder");
+        pluginsFolderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        pluginsFolderChooser.setAcceptAllFileFilterUsed(false);
+
+        jsFileChooser = new JFileChooser();
+        jsFileChooser.setCurrentDirectory(new java.io.File("."));
+        jsFileChooser.setDialogTitle("Select krpano.js");
+        jsFileChooser.setFileFilter(jsFilter);
+
+        swfFileChooser = new JFileChooser();
+        swfFileChooser.setCurrentDirectory(new java.io.File("."));
+        swfFileChooser.setDialogTitle("Select krpano.swf");
+        swfFileChooser.setFileFilter(swfFilter);
+
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -84,17 +138,69 @@ public class TourSettings extends JDialog {
                 onCancel();
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        projectField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                project.setProjectFolder(new File(projectField.getText()));
+            }
+        });
+
+        jsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (jsFileChooser.showOpenDialog(TourSettings.this) == JFileChooser.APPROVE_OPTION) {
+                    jsField.setText(jsFileChooser.getSelectedFile().getPath());
+                } else {
+                    System.out.println("No Selection ");
+                }
+            }
+        });
+
+        swfButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (swfFileChooser.showOpenDialog(TourSettings.this) == JFileChooser.APPROVE_OPTION) {
+                    swfField.setText(swfFileChooser.getSelectedFile().getPath());
+                } else {
+                    System.out.println("No Selection ");
+                }
+            }
+        });
+
+        skinButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (pluginsFolderChooser.showOpenDialog(TourSettings.this) == JFileChooser.APPROVE_OPTION) {
+                    skinField.setText(pluginsFolderChooser.getSelectedFile().getPath());
+                } else {
+                    System.out.println("No Selection ");
+                }
+            }
+        });
+
+        setLocationRelativeTo(null);
+        pack();
+        setVisible(true);
+
+        bingField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                project.setBingMapsKey(bingField.getText());
+            }
+        });
     }
 
-    public static void main(String[] args) {
-        TourSettings dialog = new TourSettings();
-        dialog.pack();
-        dialog.setVisible(true);
-        System.exit(0);
-    }
 
     private void onOK() {
-// add your code here
+        project.setProjectFolder(new File(projectField.getText()));
+        project.setBingMapsKey(bingField.getText());
+        if(skinFolderChooser.getSelectedFile()!=null)
+            project.addSkinFolder(skinFolderChooser.getSelectedFile());
+        if(jsFileChooser.getSelectedFile()!=null)
+            project.setViewers(jsFileChooser.getSelectedFile(),null);
+        if(swfFileChooser.getSelectedFile()!=null)
+            project.setViewers(null,swfFileChooser.getSelectedFile());
         dispose();
     }
 

@@ -109,7 +109,7 @@ public class SceneTemplates {
 
 
     public static final String xmlPreview = "<krpano onstart=\"loadscene(preview,null,MERGE);\">\n" +
-            "<layer name=\"map\" keep=\"true\" url=\"%SWFPATH%/../viewer/plugins/bingmaps.swf\" html5_url=\"%SWFPATH%/../viewer/plugins/googlemaps.js\" align=\"lefttop\" x=\"0\" y=\"0\" lat=\"%LATITUDE%\" lng=\"%LONGITUDE%\"  width=\"30%\" height=\"30%\" key=\"AqLMfm80B_Anoscu9iKec2WCHVUnanpUOypUPBFXQgaByF52LQUygKlwd-ty4MrB\" \n" +
+            "<layer name=\"map\" keep=\"true\" url=\"%SWFPATH%/../viewer/plugins/bingmaps.swf\" html5_url=\"%SWFPATH%/../viewer/plugins/googlemaps.js\" align=\"lefttop\" x=\"0\" y=\"0\" lat=\"%LATITUDE%\" lng=\"%LONGITUDE%\"  width=\"30%\" height=\"30%\" key=\"%BINGMAPSKEY%\" \n" +
             "maptype=\"satellite\"  zoom=\"15\"  >\n" +
             "<spot name=\"spt\" active=\"true\" headingoffset=\"%HEADINGOFFSET%\" heading=\"%HEADING%\" lat=\"%LATITUDE%\" lng=\"%LONGITUDE%\" onclick=\"loadscene(preview,null,MERGE,BLEND(1));activatespot();\"/>\n" +
             "<radar visible=\"true\" zoomwithmap=\"true\" size=\"50\" />\n" +

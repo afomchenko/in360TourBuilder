@@ -221,7 +221,7 @@ public class Pano implements Serializable {
     public Scene buildScene() {
         try {
             tilesFolderString = "pano" + id + ".tiles/";
-            tiles = new File(TourProject.getInstance().getProjectFolder() + "/tiles/" + tilesFolderString);
+            tiles = new File(TourProject.getInstance().getProjectFolder().getPath() + "/tiles/" + tilesFolderString);
             scene = new SceneImpl(this.name, this.id);
 
 
@@ -241,6 +241,11 @@ public class Pano implements Serializable {
         return null;
     }
 
+    public void updateFilePaths(){
+        tiles = new File(TourProject.getInstance().getProjectFolder().getPath() + "/tiles/" + tilesFolderString);
+        editorPreview = new File(TourProject.getInstance().getProjectFolder().getPath() + "/tiles/" + tilesFolderString + "editorpreview.jpg");
+    }
+
     public Document buildScenePreviewXML() {
 
         try {
@@ -255,7 +260,7 @@ public class Pano implements Serializable {
 
             SettingsSkin settingsSkin = new SettingsSkin();
             settingsSkin.addElement("bingmaps", "true");
-            settingsSkin.addElement("bingmaps_key", "AqLMfm80B_Anoscu9iKec2WCHVUnanpUOypUPBFXQgaByF52LQUygKlwd-ty4MrB");
+            settingsSkin.addElement("bingmaps_key", TourProject.getInstance().getBingMapsKey());
             settingsSkin.addElement("bingmaps_zoombuttons", "false");
             settingsSkin.addElement("thumbs_width", "120");
             settingsSkin.addElement("thumbs_height", "80");

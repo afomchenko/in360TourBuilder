@@ -280,7 +280,6 @@ public class NewPanoWizard extends JDialog {
                 nextButton.setVisible(false);
                 buttonOK.setVisible(true);
                 buttonOK.setEnabled(true);
-                buildPreviewTour();
 
                 if (pano.getLat() > 0) {
                     latField.setText(Double.toString(pano.getLat()));
@@ -312,6 +311,10 @@ public class NewPanoWizard extends JDialog {
         try (BufferedWriter writerHTML = new BufferedWriter(new FileWriter(project.getTempFolder().getPath() + "/krpano.html"));
              BufferedWriter writerXML = new BufferedWriter(new FileWriter(project.getTempFolder().getPath() + "/krpano.xml"))) {
 
+            if(project.getBingMapsKey()==null || project.getBingMapsKey().length()<10){
+                new BingMapsKeyDialog();
+            }
+
             writerHTML.write(SceneTemplates.htmlPreview);
             writerXML.write(SceneTemplates.xmlPreview.replace("%HEADING%", Double.toString(360 - pano.getHeading()))
                             .replace("%LATITUDE%", Double.toString(pano.getLat()))
@@ -320,6 +323,7 @@ public class NewPanoWizard extends JDialog {
                             .replace("%VLOOKAT%", Double.toString(pano.getVlookat()))
                             .replace("%HEADINGOFFSET%", Double.toString(pano.getHeading()))
                             .replace("%FOV%", Double.toString(pano.getFov()))
+                            .replace("%BINGMAPSKEY%", TourProject.getInstance().getBingMapsKey() )
             );
         } catch (IOException e) {
             e.printStackTrace();

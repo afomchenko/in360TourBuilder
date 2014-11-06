@@ -70,6 +70,7 @@ public class TourProject implements Serializable {
     private File viewerSwfFile;
     private PanoCollection panoramaStorage;
     private FTPUploader ftpUploader;
+    private String bingMapsKey = "";
 
     private TourProject() {
         panoramaStorage = new PanoCollection();
@@ -88,6 +89,14 @@ public class TourProject implements Serializable {
 
     }
 
+    public String getBingMapsKey() {
+        return bingMapsKey;
+    }
+
+    public void setBingMapsKey(String bingMapsKey) {
+        this.bingMapsKey = bingMapsKey;
+    }
+
     public static TourProject getInstance() {
         try {
             lock.lock();
@@ -99,6 +108,14 @@ public class TourProject implements Serializable {
             lock.unlock();
         }
     }
+
+//    public void updatePaths(){
+//        this.skinFolder = new File(projectFolder.getPath() + "/skin/");
+//        this.pluginsFolder = new File(projectFolder.getPath() + "/viewer/plugins/");
+//        this.viewerJsFile = new File(projectFolder.getPath() + "/viewer/krpano.js");
+//        this.viewerSwfFile = new File(projectFolder.getPath() + "/viewer/krpano.swf");
+//        this.tempFolder = new File(projectFolder.getPath() + "/temp/");
+//    }
 
     public int getComplete() {
         return complete;
@@ -146,7 +163,6 @@ public class TourProject implements Serializable {
     public void setProjectFolder(File projectFolder) {
         try {
             lock.lock();
-            if (this.projectFolder == null) {
                 System.out.println(111);
                 this.projectFolder = projectFolder;
                 this.skinFolder = new File(projectFolder.getPath() + "/skin/");
@@ -155,10 +171,20 @@ public class TourProject implements Serializable {
                 tempFolder.mkdirs();
                 pluginsFolder = new File(projectFolder.getPath() + "/viewer/plugins/");
                 pluginsFolder.mkdirs();
-            }
+                this.viewerJsFile = new File(projectFolder.getPath() + "/viewer/krpano.js");
+                this.viewerSwfFile = new File(projectFolder.getPath() + "/viewer/krpano.swf");
+                updatePanoTiles();
+
         } finally {
             lock.unlock();
         }
+    }
+
+    private void updatePanoTiles(){
+        for (Pano pano : panoramaStorage.getPanoramas()) {
+            pano.updateFilePaths();
+        }
+
     }
 
     public File getSkinFolder() {
@@ -192,18 +218,23 @@ public class TourProject implements Serializable {
 
     public void setViewers(File viewerJsFile, File viewerSwfFile) {
         if (viewerJsFile != null) {
-            System.out.println(projectFolder.getPath());
+            //System.out.println(projectFolder.getPath());
             this.viewerJsFile = new File(projectFolder.getPath() + "/viewer/krpano.js");
-            this.viewerSwfFile = new File(projectFolder.getPath() + "/viewer/krpano.swf");
             try {
                 this.viewerJsFile.mkdirs();
                 Files.copy(viewerJsFile.toPath(), this.viewerJsFile.toPath(), REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (viewerSwfFile != null) {
+            this.viewerSwfFile = new File(projectFolder.getPath() + "/viewer/krpano.swf");
+            try {
+                this.viewerSwfFile.mkdirs();
                 Files.copy(viewerSwfFile.toPath(), this.viewerSwfFile.toPath(), REPLACE_EXISTING);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
-            ;
         }
     }
 
@@ -234,7 +265,7 @@ public class TourProject implements Serializable {
 
             SettingsSkin settingsSkin = new SettingsSkin();
             settingsSkin.addElement("bingmaps", "true");
-            settingsSkin.addElement("bingmaps_key", "AqLMfm80B_Anoscu9iKec2WCHVUnanpUOypUPBFXQgaByF52LQUygKlwd-ty4MrB");
+            settingsSkin.addElement("bingmaps_key", bingMapsKey);
             settingsSkin.addElement("bingmaps_zoombuttons", "false");
             settingsSkin.addElement("thumbs_width", "120");
             settingsSkin.addElement("thumbs_height", "80");

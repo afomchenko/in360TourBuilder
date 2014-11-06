@@ -79,6 +79,7 @@ public class MainWindow extends JFrame {
     private JList panoList;
     private JPanel previewPanel;
     private JCheckBox uploadToFTPCheckBox;
+    private JButton settingsButton;
     private Pano selectedPano;
 
     private MainWindow() {
@@ -218,19 +219,28 @@ public class MainWindow extends JFrame {
             }
         });
 
+        project = TourProject.getInstance();
+        new NewProjectDialog();
+        settingsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new TourSettings();
+            }
+        });
 
         previewPanel.setLayout(new BoxLayout(previewPanel, BoxLayout.PAGE_AXIS));
         previewImagePanel = new ImagePanelEditor();
         previewImagePanel.setMaximumSize(new Dimension(600, 300));
         previewPanel.add(previewImagePanel);
 
+
+
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         this.pack();
         setLocationRelativeTo(null);
         this.setVisible(true);
 
-        project = TourProject.getInstance();
-        new NewProjectDialog();
+
     }
 
     public static MainWindow getInstance() {
