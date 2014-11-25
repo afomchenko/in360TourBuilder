@@ -161,48 +161,72 @@ public class MainWindow extends JFrame {
         hlookatField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectedPano.setHlookat(Double.parseDouble(hlookatField.getText()));
-                selectedPano.updateSceneFromPano();
+                try {
+                    selectedPano.setHlookat(Double.parseDouble(hlookatField.getText()));
+                    selectedPano.updateSceneFromPano();
+                } catch (NumberFormatException nEx) {
+                    System.err.println("illegal input field:" + hlookatField.getText());
+                }
             }
         });
 
         vlookatField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectedPano.setVlookat(Double.parseDouble(vlookatField.getText()));
-                selectedPano.updateSceneFromPano();
+                try {
+                    selectedPano.setVlookat(Double.parseDouble(vlookatField.getText()));
+                    selectedPano.updateSceneFromPano();
+                } catch (NumberFormatException nEx) {
+                    System.err.println("illegal input field:" + vlookatField.getText());
+                }
             }
         });
 
         fovField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectedPano.setFov(Double.parseDouble(fovField.getText()));
-                selectedPano.updateSceneFromPano();
+                try {
+                    selectedPano.setFov(Double.parseDouble(fovField.getText()));
+                    selectedPano.updateSceneFromPano();
+                } catch (NumberFormatException nEx) {
+                    System.err.println("illegal input field:" + fovField.getText());
+                }
             }
         });
 
         latField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectedPano.setLat(Double.parseDouble(latField.getText()));
-                selectedPano.updateSceneFromPano();
+                try {
+                    selectedPano.setLat(Double.parseDouble(latField.getText()));
+                    selectedPano.updateSceneFromPano();
+                } catch (NumberFormatException nEx) {
+                    System.err.println("illegal input field:" + latField.getText());
+                }
             }
         });
 
         lngField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectedPano.setLng(Double.parseDouble(lngField.getText()));
-                selectedPano.updateSceneFromPano();
+                try {
+                    selectedPano.setLng(Double.parseDouble(lngField.getText()));
+                    selectedPano.updateSceneFromPano();
+                } catch (NumberFormatException nEx) {
+                    System.err.println("illegal input field:" + lngField.getText());
+                }
             }
         });
 
         headingField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectedPano.setHeading(Double.parseDouble(headingField.getText()));
-                selectedPano.updateSceneFromPano();
+                try {
+                    selectedPano.setHeading(Double.parseDouble(headingField.getText()));
+                    selectedPano.updateSceneFromPano();
+                } catch (NumberFormatException nEx) {
+                    System.err.println("illegal input field:" + headingField.getText());
+                }
             }
         });
 
