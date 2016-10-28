@@ -36,6 +36,8 @@
 
 package ru.in360.elements;
 
+import ru.in360.elements.impl.ImageLevel;
+
 import java.util.List;
 
 

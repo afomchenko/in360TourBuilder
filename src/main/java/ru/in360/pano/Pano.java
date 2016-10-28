@@ -45,6 +45,7 @@ import ru.in360.FileUtils;
 import ru.in360.TourProject;
 import ru.in360.TourXMLBuilder;
 import ru.in360.elements.*;
+import ru.in360.elements.impl.*;
 
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;

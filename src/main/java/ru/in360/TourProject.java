@@ -40,6 +40,9 @@ package ru.in360;
 
 import org.w3c.dom.Document;
 import ru.in360.elements.*;
+import ru.in360.elements.impl.ActionImpl;
+import ru.in360.elements.impl.IncludeImpl;
+import ru.in360.elements.impl.SettingsSkin;
 import ru.in360.pano.Pano;
 
 import javax.xml.parsers.ParserConfigurationException;

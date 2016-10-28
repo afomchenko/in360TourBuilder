@@ -38,7 +38,7 @@
 
 package ru.in360;
 
-import ru.in360.elements.HotspotImage;
+import ru.in360.elements.impl.HotspotImage;
 import ru.in360.elements.Scene;
 import ru.in360.pano.Pano;
 
