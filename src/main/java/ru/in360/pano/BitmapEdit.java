@@ -157,7 +157,7 @@ public final class BitmapEdit {
         GeoLocation location = null;
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(equiImage);
-            GpsDirectory directory = metadata.getDirectory(GpsDirectory.class);
+            GpsDirectory directory = metadata.getFirstDirectoryOfType(GpsDirectory.class);
             if (directory != null) {
                 location = directory.getGeoLocation();
                 System.out.println(location.toString());
