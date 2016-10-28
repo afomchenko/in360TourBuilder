@@ -54,24 +54,10 @@ public class PanoCollection implements Serializable {
         panoramas = new HashMap<>();
         linkStorage = new LinkCollection();
     }
-//    private static Lock lock = new ReentrantLock();
-//    private static PanoStorage instance;
 
     public Collection<Pano> getPanoramas() {
         return panoramas.values();
     }
-
-//    public static PanoStorage getInstance(){
-//        try{
-//            lock.lock();
-//            if(instance==null){
-//                instance = new PanoStorage();
-//            }
-//            return instance;
-//        }finally {
-//            lock.unlock();
-//        }
-//    }
 
     public LinkCollection getLinkStorage() {
         return linkStorage;

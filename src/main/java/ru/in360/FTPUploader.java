@@ -77,9 +77,6 @@ public class FTPUploader implements Serializable {
 
             System.out.println("Connected");
 
-            String remoteDirPath = "/Upload";
-            String localDirPath = "E:/winhex";
-
             FTPUtil.saveFilesToServer(ftpClient, remoteProject, src);
 
             // log out and disconnect from the server
@@ -104,14 +101,12 @@ public class FTPUploader implements Serializable {
 
             // use local passive mode to pass firewall
             ftpClient.enterLocalPassiveMode();
-            //ftpClient.makeDirectory(remoteProject);
 
             String path = "";
             for (String dir : (remoteProject + dest.getPath()).split("/")) {
                 ftpClient.makeDirectory(path + "/" + dir);
                 path = path + "/" + dir;
             }
-
 
             System.out.println("Connected");
 
