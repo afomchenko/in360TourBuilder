@@ -40,6 +40,7 @@ package ru.in360;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,24 +55,8 @@ import java.io.InputStream;
 public class FTPUtil {
 
 
-//    public static void main(String[] args) throws IOException {
-//        saveFilesToServer("/tezt", new File("E:/winhex"));
-//    }
-
     public static void saveFilesToServer(FTPClient ftp, String remoteDest, File localSrc) throws IOException {
-//        FTPClient ftp = new FTPClient();
-//
-//        ftp.connect("46.8.19.232", 21);
-//
-//
-//        if (!FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
-//            ftp.disconnect();
-//            System.out.println("FTP not disconnected");
-//        }
-//        ftp.login("admin", "fa43limited");
-//        ftp.enterLocalPassiveMode();
         System.out.println("Connected to server .");
-
 
         System.out.println("remote directory: " + remoteDest);
         ftp.changeWorkingDirectory(remoteDest);
