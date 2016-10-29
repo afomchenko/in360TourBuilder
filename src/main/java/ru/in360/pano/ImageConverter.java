@@ -37,9 +37,9 @@
 
 package ru.in360.pano;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
-import com.sun.media.jai.codec.*;
+//import com.sun.image.codec.jpeg.JPEGCodec;
+//import com.sun.image.codec.jpeg.JPEGImageEncoder;
+//import com.sun.media.jai.codec.*;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -56,38 +56,38 @@ import java.io.IOException;
 
 public class ImageConverter {
 
-    static Image loadImage(byte[] data) throws IOException {
-        Image image = null;
-        SeekableStream stream = new ByteArraySeekableStream(data);
-        String[] names = ImageCodec.getDecoderNames(stream);
-        ImageDecoder dec =
-                ImageCodec.createImageDecoder(names[0], stream, null);
-        RenderedImage im = dec.decodeAsRenderedImage();
-        image = PlanarImage.wrapRenderedImage(im).getAsBufferedImage();
-
-        data = null;
-        im = null;
-        stream.close();
-        //System.gc();
-        return image;
-    }
-
-    public static void toBitmap(File in, File out) throws IOException {
-
-        try {
-            SeekableStream s = new FileSeekableStream(in);
-            TIFFDecodeParam param = null;
-            ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param);
-            RenderedImage op = dec.decodeAsRenderedImage();
-            FileOutputStream fos = new FileOutputStream(out);
-            JPEGImageEncoder jpeg = JPEGCodec.createJPEGEncoder(fos);
-
-            jpeg.encode(op.getData());
-            fos.close();
-        } catch (java.io.IOException ioe) {
-            System.out.println(ioe);
-        }
-    }
+//    static Image loadImage(byte[] data) throws IOException {
+//        Image image = null;
+//        SeekableStream stream = new ByteArraySeekableStream(data);
+//        String[] names = ImageCodec.getDecoderNames(stream);
+//        ImageDecoder dec =
+//                ImageCodec.createImageDecoder(names[0], stream, null);
+//        RenderedImage im = dec.decodeAsRenderedImage();
+//        image = PlanarImage.wrapRenderedImage(im).getAsBufferedImage();
+//
+//        data = null;
+//        im = null;
+//        stream.close();
+//        //System.gc();
+//        return image;
+//    }
+//
+//    public static void toBitmap(File in, File out) throws IOException {
+//
+//        try {
+//            SeekableStream s = new FileSeekableStream(in);
+//            TIFFDecodeParam param = null;
+//            ImageDecoder dec = ImageCodec.createImageDecoder("tiff", s, param);
+//            RenderedImage op = dec.decodeAsRenderedImage();
+//            FileOutputStream fos = new FileOutputStream(out);
+//            JPEGImageEncoder jpeg = JPEGCodec.createJPEGEncoder(fos);
+//
+//            jpeg.encode(op.getData());
+//            fos.close();
+//        } catch (java.io.IOException ioe) {
+//            System.out.println(ioe);
+//        }
+//    }
 
 
 //
