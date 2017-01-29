@@ -37,13 +37,16 @@
 
 package ru.in360.GUI;
 
-import ru.in360.FileUtils;
 import ru.in360.TourProject;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 
 public class TourSettings extends JDialog {

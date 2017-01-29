@@ -67,155 +67,138 @@
  *    вместе с этой программой. Если это не так, см.
  *    <http://www.gnu.org/licenses/>.
  *
- * 06.11.14 1:47 Anton Fomchenko 360@in360.ru
+ * 06.11.14 1:54 Anton Fomchenko 360@in360.ru
  */
 
-package ru.in360.elements.impl;
+package ru.in360.beans;
 
+import ru.in360.constants.FOVType;
+import ru.in360.constants.LimitView;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import ru.in360.elements.Action;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
-import java.util.ArrayList;
-import java.util.List;
+@XmlRootElement(name = "view")
+public class ViewInfo {
 
-public class ActionImpl implements Action {
-    private static final long serialVersionUID = -2352185120871649461L;
-    private String name;
-    private Autorun autorun;
-    private boolean secure;
-    private List<String> content = new ArrayList<>();
-    private int count;
+    private Double hlookat;
+    private Double vlookat;
+    private Double fov;
+    private FOVType fovtype = FOVType.MFOV;
+    private Double maxpixelzoom;
+    private Double fovmin;
+    private Double fovmax;
+    private LimitView limitview = LimitView.AUTO;
 
-    public ActionImpl(String name) {
-        this(name, Autorun.NONE, false);
+    public ViewInfo() {
+        fov = 70D;
+        hlookat = 0.0D;
+        vlookat = 0.0D;
+        maxpixelzoom = 1.0D;
+        fovmin = 50D;
+        fovmax = 120D;
     }
 
-    public ActionImpl(String name, Autorun autorun, boolean secure) {
-        this.name = name;
-        this.autorun = autorun;
-        this.secure = secure;
-        count = 0;
+    public ViewInfo(double hlookat, double vlookat, double fov) {
+        this();
+        this.hlookat = hlookat;
+        this.vlookat = vlookat;
+        this.fov = fov;
     }
 
-    public ActionImpl() {
-        this(null, Autorun.NONE, false);
+    @XmlAttribute
+    public double getHlookat() {
+        return hlookat;
     }
 
-    public Action addContentString(String content) {
-        this.content.add(content);
-        return this;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public Autorun getAutorun() {
-        return autorun;
-    }
-
-    @Override
-    public void setAutorun(Autorun autorun) {
-        this.autorun = autorun;
-    }
-
-    @Override
-    public boolean isSecure() {
-        return secure;
-    }
-
-    @Override
-    public void setSecure(boolean secure) {
-        this.secure = secure;
-    }
-
-    @Override
-    public List<String> getContent() {
-        return content;
-    }
-
-    @Override
-    public void setContent(List<String> content) {
-        this.content = content;
-        count++;
-    }
-
-    @Override
-    public int getCount() {
-        return count;
-    }
-
-    @Override
-    public void addActionContent(String actionContent) {
-        content.add(actionContent);
-    }
-
-    @Override
-    public String getActionContentString() {
-        if (content.size() < 1) return "";
-        StringBuilder actionBuilder = new StringBuilder("");
-        for (String actionContent : content) {
-            actionBuilder.append(actionContent);
-            if (!actionContent.trim().endsWith(";")) actionBuilder.append(";");
+    public void setHlookat(double hlookat) {
+        if (hlookat > 180) {
+            this.hlookat = hlookat - 360;
+        } else if (hlookat < -180) {
+            this.hlookat = hlookat + 360;
+        } else {
+            this.hlookat = hlookat;
         }
-        return actionBuilder.toString();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ActionImpl actionImpl = (ActionImpl) o;
-
-        if (content != null ? !content.equals(actionImpl.content) : actionImpl.content != null) return false;
-        if (!name.equals(actionImpl.name)) return false;
-
-        return true;
+    @XmlAttribute
+    public double getVlookat() {
+        return vlookat;
     }
 
-    @Override
-    public int hashCode() {
-        return name.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        if (content.size() < 1) return "";
-        StringBuilder actionBuilder = new StringBuilder("<action name=\"").append(name).append('\"');
-        if (secure != false)
-            actionBuilder.append(" secure=\"").append(secure).append('\"');
-        if (autorun != Autorun.NONE)
-            actionBuilder.append(" autorun=\"").append(autorun.getLabel()).append('\"');
-        actionBuilder.append(">\n");
-        for (String actionContent : content) {
-            actionBuilder.append(actionContent);
-            if (!actionContent.trim().endsWith(";")) actionBuilder.append(";");
-            actionBuilder.append("\n");
+    public void setVlookat(double vlookat) {
+        if (vlookat > 90D) {
+            this.vlookat = vlookat - 180D;
+        } else if (vlookat < -90D) {
+            this.vlookat = vlookat + 180D;
+        } else {
+            this.vlookat = vlookat;
         }
-        return actionBuilder.append("</action>\n").toString();
     }
 
-    @Override
-    public Element getXMLElement(Document doc) {
-        Element actionTag = doc.createElement("action");
-        actionTag.setAttribute("name", name);
-        if (secure != false)
-            actionTag.setAttribute("secure", Boolean.valueOf(secure).toString());
-        if (autorun != Autorun.NONE)
-            actionTag.setAttribute("autorun", autorun.getLabel());
-        for (String actionContent : content) {
-            actionTag.setTextContent(getActionContentString());
+    @XmlAttribute
+    public double getFov() {
+        return fov;
+    }
+
+    public void setFov(double fov) {
+        if (fov > 179D) {
+            this.fov = 179D;
+        } else {
+            this.fov = Math.abs(fov);
         }
-        return actionTag;
+    }
+
+    @XmlAttribute
+    public FOVType getFovtype() {
+        return fovtype;
+    }
+
+    public void setFovtype(FOVType fovtype) {
+        this.fovtype = fovtype;
+    }
+
+    @XmlAttribute
+    public double getMaxpixelzoom() {
+        return maxpixelzoom;
+    }
+
+    public void setMaxpixelzoom(double maxpixelzoom) {
+        this.maxpixelzoom = Math.abs(maxpixelzoom);
+    }
+
+    @XmlAttribute
+    public double getFovmin() {
+        return fovmin;
+    }
+
+    public void setFovmin(double fovmin) {
+        if (fovmin > 179D) {
+            this.fovmin = 179D;
+        } else {
+            this.fovmin = Math.abs(fovmin);
+        }
+    }
+
+    @XmlAttribute
+    public double getFovmax() {
+        return fovmax;
+    }
+
+    public void setFovmax(double fovmax) {
+        if (fovmax > 179D) {
+            this.fovmax = 179D;
+        } else {
+            this.fovmax = Math.abs(fovmax);
+        }
+    }
+
+    @XmlAttribute
+    public LimitView getLimitview() {
+        return limitview;
+    }
+
+    public void setLimitview(LimitView limitview) {
+        this.limitview = limitview;
     }
 }

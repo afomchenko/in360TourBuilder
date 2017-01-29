@@ -39,7 +39,11 @@ package ru.in360.GUI;
 import ru.in360.TourProject;
 
 import javax.swing.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class BingMapsKeyDialog extends JDialog {
     private JPanel contentPane;

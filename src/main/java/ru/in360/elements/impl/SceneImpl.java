@@ -75,7 +75,12 @@ package ru.in360.elements.impl;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import ru.in360.elements.*;
+import ru.in360.elements.Action;
+import ru.in360.elements.Hotspot;
+import ru.in360.elements.ImagePano;
+import ru.in360.elements.Preview;
+import ru.in360.elements.Scene;
+import ru.in360.elements.View;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -215,28 +220,35 @@ public class SceneImpl implements Scene {
     public Element getXMLElement(Document doc) {
         Element sceneTag = doc.createElement("scene");
         sceneTag.setAttribute("name", name);
-        if (title != null)
+        if (title != null) {
             sceneTag.setAttribute("title", title);
-        if (onstart != null)
+        }
+        if (onstart != null) {
             sceneTag.setAttribute("onstart", onstart.getActionContentString());
-        if (thumburl != null)
+        }
+        if (thumburl != null) {
             sceneTag.setAttribute("thumburl", thumburl);
+        }
         if (lat != 0) {
             sceneTag.setAttribute("lat", Double.toString(lat));
             sceneTag.setAttribute("lng", Double.toString(lng));
             sceneTag.setAttribute("heading", Double.toString(heading));
             sceneTag.setAttribute("headingoffset", Double.toString(360D - heading));
         }
-        if (view != null)
+        if (view != null) {
             sceneTag.appendChild(view.getXMLElement(doc));
-        if (preview != null)
+        }
+        if (preview != null) {
             sceneTag.appendChild(preview.getXMLElement(doc));
-        if (image != null)
+        }
+        if (image != null) {
             sceneTag.appendChild(image.getXMLElement(doc));
-        if (sceneHotspots.size() > 0)
+        }
+        if (sceneHotspots.size() > 0) {
             for (Hotspot hotspot : sceneHotspots.values()) {
                 sceneTag.appendChild(hotspot.getXMLElement(doc));
             }
+        }
         return sceneTag;
     }
 }

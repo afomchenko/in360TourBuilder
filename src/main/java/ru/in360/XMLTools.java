@@ -38,6 +38,9 @@ package ru.in360;
 
 import org.w3c.dom.Document;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -47,17 +50,23 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class XMLTools {
 
 
     public static void writeDOM(Document doc, File file) throws TransformerException, IOException {
         Transformer t = TransformerFactory.newInstance().newTransformer();
-        //t.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "mydtd.dtd");
         t.setOutputProperty(OutputKeys.INDENT, "yes");
         t.setOutputProperty(OutputKeys.METHOD, "xml");
         t.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
         t.transform(new DOMSource(doc), new StreamResult(new FileWriter(file)));
+    }
+
+    public static XMLStreamReader getAsXMLStream(InputStream stream) throws XMLStreamException {
+        XMLInputFactory xif = XMLInputFactory.newFactory();
+        XMLStreamReader xsr = xif.createXMLStreamReader(stream);
+        return xif.createFilteredReader(xsr, reader -> reader.getEventType() != XMLStreamReader.CHARACTERS || reader.getText().trim().length() > 0);
     }
 
 }

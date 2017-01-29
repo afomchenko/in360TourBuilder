@@ -44,8 +44,20 @@ import org.w3c.dom.Document;
 import ru.in360.FileUtils;
 import ru.in360.TourProject;
 import ru.in360.TourXMLBuilder;
-import ru.in360.elements.*;
-import ru.in360.elements.impl.*;
+import ru.in360.elements.Action;
+import ru.in360.elements.ImagePano;
+import ru.in360.elements.Include;
+import ru.in360.elements.Scene;
+import ru.in360.elements.impl.ActionImpl;
+import ru.in360.elements.impl.ImageElementImpl;
+import ru.in360.elements.impl.ImageImpl;
+import ru.in360.elements.impl.ImageLevel;
+import ru.in360.elements.impl.ImageLevelMobile;
+import ru.in360.elements.impl.IncludeImpl;
+import ru.in360.elements.impl.PreviewImpl;
+import ru.in360.elements.impl.SceneImpl;
+import ru.in360.elements.impl.SettingsSkin;
+import ru.in360.elements.impl.ViewImpl;
 
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
@@ -57,7 +69,11 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Pano implements Serializable {
 

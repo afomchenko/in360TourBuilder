@@ -38,12 +38,17 @@
 
 package ru.in360;
 
-import ru.in360.elements.impl.HotspotImage;
 import ru.in360.elements.Scene;
+import ru.in360.elements.impl.HotspotImage;
 import ru.in360.pano.Pano;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class PanoCollection implements Serializable {
     private static final long serialVersionUID = 3724987692157543087L;

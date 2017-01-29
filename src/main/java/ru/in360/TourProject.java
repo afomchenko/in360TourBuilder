@@ -39,7 +39,9 @@ package ru.in360;
 
 
 import org.w3c.dom.Document;
-import ru.in360.elements.*;
+import ru.in360.elements.Action;
+import ru.in360.elements.Include;
+import ru.in360.elements.Scene;
 import ru.in360.elements.impl.ActionImpl;
 import ru.in360.elements.impl.IncludeImpl;
 import ru.in360.elements.impl.SettingsSkin;
@@ -47,7 +49,15 @@ import ru.in360.pano.Pano;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -246,7 +256,7 @@ public class TourProject implements Serializable {
         File htmlFile = new File(projectFolder.getPath() + "/index.html");
         try (BufferedWriter writerHTML = new BufferedWriter(new FileWriter(htmlFile))) {
             writerHTML.write(SceneTemplates.htmlBuild.replace("%TITLE%", this.getProjectName()));
-            XMLTools.writeDOM(buildTourXML(), new File(projectFolder.getPath() + "/tour.xml"));
+            XMLTools.writeDOM(buildTourXML(), new File(projectFolder.getPath() + "/ru/in360/tour.xml"));
         } catch (TransformerException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -316,7 +326,7 @@ public class TourProject implements Serializable {
             complete = 0;
             ftpUploader.upload(new File(projectFolder.getPath() + "/index.html"), new URI("/" + projectName));
             complete += 10;
-            ftpUploader.upload(new File(projectFolder.getPath() + "/tour.xml"), new URI("/" + projectName));
+            ftpUploader.upload(new File(projectFolder.getPath() + "/ru/in360/tour.xml"), new URI("/" + projectName));
             complete += 10;
             ftpUploader.upload(skinFolder, new URI("/" + projectName));
             complete += 10;
