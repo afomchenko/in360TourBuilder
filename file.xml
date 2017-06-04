@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<krpano title="Virtual Tour" version="1.18" onstart="doSomething(); doSomethingElse();">
-    <scene title="Test Scene" onstart="doSomething(); doSomethingElse();" lat="123.12345" lng="132.54321" heading="180.0" headingOffset="90.0" name="scene_1">
-        <view fov="120.0" fovmax="140.0" fovmin="90.0" fovtype="MFOV" hlookat="5.0" limitview="auto" maxpixelzoom="1.0" vlookat="90.0"/>
-    </scene>
-    <scene title="Test Scene" onstart="doSomething(); doSomethingElse();" lat="123.12345" lng="132.54321" heading="180.0" headingOffset="90.0" name="scene_2">
-        <view fov="120.0" fovmax="140.0" fovmin="90.0" fovtype="MFOV" hlookat="5.0" limitview="auto" maxpixelzoom="1.0" vlookat="90.0"/>
-    </scene>
-</krpano>
