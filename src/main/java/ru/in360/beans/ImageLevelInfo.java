@@ -7,9 +7,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "level")
 public class ImageLevelInfo {
     @XmlAttribute
-    private Integer tiledimagewidth;
+    public Integer tiledimagewidth;
     @XmlAttribute
-    private Integer tiledimageheight;
+    public Integer tiledimageheight;
     @XmlElementRef(name="cube", type=CubeImageElementInfo.class)
-    private ImageElementInfo imageElement;
+    public ImageElementInfo imageElement;
 }

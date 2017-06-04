@@ -12,6 +12,10 @@ public class IncludeInfo extends TourElement {
     public IncludeInfo() {
     }
 
+    public IncludeInfo(String urlString) {
+        this.url = urlString;
+    }
+
     public IncludeInfo(URI url) {
         this.url = url.getPath();
     }

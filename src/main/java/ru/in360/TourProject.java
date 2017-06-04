@@ -38,20 +38,14 @@
 package ru.in360;
 
 
-import org.w3c.dom.Document;
-import ru.in360.elements.Action;
-import ru.in360.elements.Include;
-import ru.in360.elements.Scene;
-import ru.in360.elements.impl.ActionImpl;
-import ru.in360.elements.impl.IncludeImpl;
-import ru.in360.elements.impl.SettingsSkin;
+import org.apache.log4j.Logger;
+import ru.in360.beans.TourInfo;
 import ru.in360.pano.Pano;
 
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerException;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -70,6 +64,7 @@ public class TourProject implements Serializable {
     private final static Lock lock = new ReentrantLock();
     private static final long serialVersionUID = -8676518388266115774L;
 
+    final static Logger logger = Logger.getLogger(TourProject.class);
 
     private static TourProject instance;
     public int complete = 0;
@@ -92,7 +87,6 @@ public class TourProject implements Serializable {
 
     private TourProject(String projectName, File projectFolder, File skinFolder, File viewerJsFile, File viewerSwfFile) {
         this.projectName = projectName;
-
 
         this.projectFolder = projectFolder;
         this.skinFolder = new File(projectFolder.getPath() + "/skin/");
@@ -176,24 +170,23 @@ public class TourProject implements Serializable {
     public void setProjectFolder(File projectFolder) {
         try {
             lock.lock();
-                System.out.println(111);
-                this.projectFolder = projectFolder;
-                this.skinFolder = new File(projectFolder.getPath() + "/skin/");
-                skinFolder.mkdirs();
-                tempFolder = new File(projectFolder.getPath() + "/temp/");
-                tempFolder.mkdirs();
-                pluginsFolder = new File(projectFolder.getPath() + "/viewer/plugins/");
-                pluginsFolder.mkdirs();
-                this.viewerJsFile = new File(projectFolder.getPath() + "/viewer/krpano.js");
-                this.viewerSwfFile = new File(projectFolder.getPath() + "/viewer/krpano.swf");
-                updatePanoTiles();
+            this.projectFolder = projectFolder;
+            this.skinFolder = new File(projectFolder.getPath() + "/skin/");
+            skinFolder.mkdirs();
+            tempFolder = new File(projectFolder.getPath() + "/temp/");
+            tempFolder.mkdirs();
+            pluginsFolder = new File(projectFolder.getPath() + "/viewer/plugins/");
+            pluginsFolder.mkdirs();
+            this.viewerJsFile = new File(projectFolder.getPath() + "/viewer/krpano.js");
+            this.viewerSwfFile = new File(projectFolder.getPath() + "/viewer/krpano.swf");
+            updatePanoTiles();
 
         } finally {
             lock.unlock();
         }
     }
 
-    private void updatePanoTiles(){
+    private void updatePanoTiles() {
         for (Pano pano : panoramaStorage.getPanoramas()) {
             pano.updateFilePaths();
         }
@@ -212,7 +205,7 @@ public class TourProject implements Serializable {
         try {
             FileUtils.copyFolder(newSkinFolder, this.skinFolder);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
@@ -220,10 +213,9 @@ public class TourProject implements Serializable {
         try {
             FileUtils.copyFolder(newPluginsFolder, this.pluginsFolder);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
-
 
     public File getViewerSwfFile() {
         return viewerSwfFile;
@@ -231,13 +223,12 @@ public class TourProject implements Serializable {
 
     public void setViewers(File viewerJsFile, File viewerSwfFile) {
         if (viewerJsFile != null) {
-            //System.out.println(projectFolder.getPath());
             this.viewerJsFile = new File(projectFolder.getPath() + "/viewer/krpano.js");
             try {
                 this.viewerJsFile.mkdirs();
                 Files.copy(viewerJsFile.toPath(), this.viewerJsFile.toPath(), REPLACE_EXISTING);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
         if (viewerSwfFile != null) {
@@ -246,7 +237,7 @@ public class TourProject implements Serializable {
                 this.viewerSwfFile.mkdirs();
                 Files.copy(viewerSwfFile.toPath(), this.viewerSwfFile.toPath(), REPLACE_EXISTING);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
     }
@@ -256,67 +247,22 @@ public class TourProject implements Serializable {
         File htmlFile = new File(projectFolder.getPath() + "/index.html");
         try (BufferedWriter writerHTML = new BufferedWriter(new FileWriter(htmlFile))) {
             writerHTML.write(SceneTemplates.htmlBuild.replace("%TITLE%", this.getProjectName()));
-            XMLTools.writeDOM(buildTourXML(), new File(projectFolder.getPath() + "/ru/in360/tour.xml"));
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+
+            TourInfoFactory.getTourMarshaller()
+                    .marshal(TourInfoFactory.createTourInfo(panoramaStorage.getScenes()), new File(projectFolder.getPath() + "/ru/in360/tour.xml"));
+        } catch (IOException | JAXBException e) {
+            logger.error(e);
         }
         return htmlFile;
-    }
-
-    private Document buildTourXML() {
-        try {
-            Action actionImpl = new ActionImpl("startup", ActionImpl.Autorun.NONE, false);
-            actionImpl.addActionContent("if(startscene === null, copy(startscene,scene[0].name));");
-            actionImpl.addActionContent("loadscene(get(startscene), null, MERGE);");
-            Include include = new IncludeImpl("%SWFPATH%/../skin/vtourskin.xml");
-            TourXMLBuilder builder = new TourXMLBuilder("1.18", "Virtual Tour", "startup();");
-
-            builder.add(actionImpl);
-            builder.add(include);
-
-            SettingsSkin settingsSkin = new SettingsSkin();
-            settingsSkin.addElement("bingmaps", "true");
-            settingsSkin.addElement("bingmaps_key", bingMapsKey);
-            settingsSkin.addElement("bingmaps_zoombuttons", "false");
-            settingsSkin.addElement("thumbs_width", "120");
-            settingsSkin.addElement("thumbs_height", "80");
-            settingsSkin.addElement("thumbs_padding", "10");
-            settingsSkin.addElement("thumbs_crop", "0|40|240|160");
-            settingsSkin.addElement("thumbs_opened", "false");
-            settingsSkin.addElement("thumbs_text", "true");
-            settingsSkin.addElement("thumbs_dragging", "true");
-            settingsSkin.addElement("thumbs_onhoverscrolling", "false");
-            settingsSkin.addElement("thumbs_scrollbuttons", "false");
-            settingsSkin.addElement("thumbs_scrollindicator", "false");
-            settingsSkin.addElement("thumbs_loop", "false");
-            settingsSkin.addElement("tooltips_thumbs", "false");
-            settingsSkin.addElement("tooltips_hotspots", "true");
-            settingsSkin.addElement("tooltips_mapspots", "false");
-            settingsSkin.addElement("controlbar_offset", "0");
-            builder.add(settingsSkin);
-
-
-            for (Scene scene : panoramaStorage.getScenes()) {
-                builder.add(scene);
-            }
-
-            return builder.build();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public void saveProject() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(projectFolder.getPath() + "/project.proj")))) {
             oos.writeObject(this);
             oos.flush();
-        } catch (FileNotFoundException e1) {
-            e1.printStackTrace();
         } catch (IOException e1) {
-            e1.printStackTrace();
+            logger.error(e1);
         }
     }
 
@@ -338,14 +284,15 @@ public class TourProject implements Serializable {
                     ftpUploader.upload(pano.getTiles(), new URI("/" + projectName + "/tiles"));
                     pano.setUploaded(true);
                     complete += 5;
-                    if (complete >= 95) complete = 95;
+                    if (complete >= 95) {
+                        complete = 95;
+                    }
                 }
             }
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
-
 
     public File getViewerJsFile() {
         return viewerJsFile;

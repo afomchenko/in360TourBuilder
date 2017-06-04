@@ -38,8 +38,7 @@
 
 package ru.in360;
 
-import ru.in360.elements.Scene;
-import ru.in360.elements.impl.HotspotImage;
+import ru.in360.beans.SceneInfo;
 import ru.in360.pano.Pano;
 
 import java.io.Serializable;
@@ -105,26 +104,26 @@ public class PanoCollection implements Serializable {
         return nearest;
     }
 
-    public List<Scene> getScenes() {
-        List<Scene> list = new ArrayList<>();
+    public List<SceneInfo> getScenes() {
+        List<SceneInfo> list = new ArrayList<>();
 
         for (Pano pano : panoramas.values()) {
-            Scene sc = pano.getScene();
+            SceneInfo sc = pano.getScene();
             Map<Integer, Integer> nearestPanos = getNearest(pano);
 
-            sc.getSceneHotspots().clear();
+            //sc.getSceneHotspots().clear();
 
             int i = 0;
             for (Map.Entry<Integer, Integer> entry : nearestPanos.entrySet()) {
                 if (i > 4) break;
                 System.err.println("add hotspot " + entry.getValue() + ": " + entry.getKey());
 
-                sc.addHotspot(new HotspotImage(panoramas.get(entry.getValue()).getName() + ": " + entry.getKey() + "m",
-                        "scene_" + entry.getValue(), linkStorage.calcHeading(pano, panoramas.get(entry.getValue())) + pano.getHeading() - 90, 10));
+                //sc.addHotspot(new HotspotImage(panoramas.get(entry.getValue()).getName() + ": " + entry.getKey() + "m",
+                //        "scene_" + entry.getValue(), linkStorage.calcHeading(pano, panoramas.get(entry.getValue())) + pano.getHeading() - 90, 10));
 
                 i++;
             }
-            list.add(pano.getScene());
+            list.add(sc);
         }
         return list;
     }

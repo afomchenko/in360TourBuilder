@@ -252,7 +252,7 @@ public class NewPanoWizard extends JDialog {
 
     private void onOK() {
         saveFields();
-        pano.buildScene();
+        pano.buildSceneInfo();
         project.getPanoramaStorage().addPano(pano);
         MainWindow.getInstance().updatePanoList();
         dispose();

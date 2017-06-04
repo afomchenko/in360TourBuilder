@@ -7,14 +7,15 @@ import ru.in360.constants.ImageType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "image")
 public class ImageInfo {
     @XmlElement(name = "level")
-    List<ImageLevelInfo> levels;
+    List<ImageLevelInfo> levels = new ArrayList<>();
     @XmlElement(name = "mobile")
-    List<ImageLevelInfo> mobileLevels;
+    List<ImageLevelInfo> mobileLevels  = new ArrayList<>();
     @XmlAttribute
     public ImageType type;
     @XmlAttribute
@@ -39,4 +40,12 @@ public class ImageInfo {
     public Integer frame;
     @XmlAttribute
     public String prealign;
+
+    public void addLevel(ImageLevelInfo level){
+        levels.add(level);
+    }
+
+    public void addMobileLevel(ImageLevelInfo mobileLevel){
+        mobileLevels.add(mobileLevel);
+    }
 }

@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlElementRefs;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "krpano")
@@ -29,5 +30,9 @@ public class TourInfo {
             @XmlElementRef(name="scene", type=SceneInfo.class)
     })
     @XmlMixed
-    public List<TourElement> elements;
+    public List<TourElement> elements = new ArrayList<>();
+
+    public void addTourElement(TourElement element){
+        elements.add(element);
+    }
 }

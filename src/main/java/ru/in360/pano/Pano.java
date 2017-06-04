@@ -40,30 +40,25 @@ package ru.in360.pano;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.resizers.BicubicResizer;
 import net.coobird.thumbnailator.resizers.configurations.Antialiasing;
-import org.w3c.dom.Document;
+import org.apache.log4j.Logger;
 import ru.in360.FileUtils;
+import ru.in360.SceneTemplates;
+import ru.in360.TourInfoFactory;
 import ru.in360.TourProject;
-import ru.in360.TourXMLBuilder;
-import ru.in360.elements.Action;
-import ru.in360.elements.ImagePano;
-import ru.in360.elements.Include;
-import ru.in360.elements.Scene;
-import ru.in360.elements.impl.ActionImpl;
-import ru.in360.elements.impl.ImageElementImpl;
-import ru.in360.elements.impl.ImageImpl;
-import ru.in360.elements.impl.ImageLevel;
-import ru.in360.elements.impl.ImageLevelMobile;
-import ru.in360.elements.impl.IncludeImpl;
-import ru.in360.elements.impl.PreviewImpl;
-import ru.in360.elements.impl.SceneImpl;
-import ru.in360.elements.impl.SettingsSkin;
-import ru.in360.elements.impl.ViewImpl;
+import ru.in360.beans.CubeImageElementInfo;
+import ru.in360.beans.ImageInfo;
+import ru.in360.beans.ImageLevelInfo;
+import ru.in360.beans.SceneInfo;
+import ru.in360.constants.ImageType;
 
 import javax.imageio.ImageIO;
-import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
+import javax.xml.bind.JAXBException;
+import java.awt.Desktop;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -85,9 +80,8 @@ public class Pano implements Serializable {
     public int complete = 0;
     private String name;
     private transient PanoRaw panoRaw;
-    private ImagePano imagePano;
     private String tilesFolderString;
-    private Scene scene;
+    private SceneInfo sceneInfo;
     private File tiles;
     private File editorPreview;
     private double lng;
@@ -97,6 +91,8 @@ public class Pano implements Serializable {
     private double vlookat;
     private double fov = 70.0;
     private boolean uploaded = false;
+
+    private final static Logger logger = Logger.getLogger(Pano.class);
 
     public Pano(String name) {
         this.name = name;
@@ -126,12 +122,18 @@ public class Pano implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Pano)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Pano)) {
+            return false;
+        }
 
         Pano pano = (Pano) o;
 
-        if (id != pano.id) return false;
+        if (id != pano.id) {
+            return false;
+        }
 
         return true;
     }
@@ -165,8 +167,8 @@ public class Pano implements Serializable {
         this.fov = fov;
     }
 
-    public Scene getScene() {
-        return scene;
+    public SceneInfo getScene() {
+        return sceneInfo;
     }
 
     public void generateImages(String path, boolean doOversample) {
@@ -209,10 +211,11 @@ public class Pano implements Serializable {
     }
 
     public File getPreviewImage() {
-        if (panoRaw != null)
+        if (panoRaw != null) {
             return panoRaw.previewImage;
-        else
+        } else {
             return editorPreview;
+        }
     }
 
     public File getThumb() {
@@ -235,78 +238,43 @@ public class Pano implements Serializable {
         this.name = name;
     }
 
-    public Scene buildScene() {
-        try {
-            tilesFolderString = "pano" + id + ".tiles/";
-            tiles = new File(TourProject.getInstance().getProjectFolder().getPath() + "/tiles/" + tilesFolderString);
-            scene = new SceneImpl(this.name, this.id);
-
-
-            scene.setView(new ViewImpl(hlookat, vlookat, fov));
-            scene.setImage(addPano(TILESIZE_DEFAULT));
-            scene.setCoordinates(lng, lat, heading);
-            scene.setPreview(new PreviewImpl("%SWFPATH%/../tiles/" + tilesFolderString + "preview.jpg"));
-            scene.setThumburl(addThumbPano());
-
-            panoRaw = null;
-            return scene;
-        } catch (OutOfMemoryError e) {
-            System.out.println("not enough memory, adding panorama aborted");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public void buildSceneImages() throws IOException {
+        tilesFolderString = "pano" + id + ".tiles/";
+        tiles = new File(TourProject.getInstance().getProjectFolder().getPath() + "/tiles/" + tilesFolderString);
+        addThumbPano();
     }
 
-    public void updateFilePaths(){
+    public SceneInfo buildSceneInfo() {
+        try {
+            buildSceneImages();
+            return TourInfoFactory.buildSceneInfo(this);
+        } catch (OutOfMemoryError e) {
+            logger.error("not enough memory, adding panorama aborted", e);
+            return null;
+        } catch (Exception e) {
+            logger.error("unexpected error, adding panorama aborted", e);
+            return null;
+        }
+    }
+
+    public void updateFilePaths() {
         tiles = new File(TourProject.getInstance().getProjectFolder().getPath() + "/tiles/" + tilesFolderString);
         editorPreview = new File(TourProject.getInstance().getProjectFolder().getPath() + "/tiles/" + tilesFolderString + "editorpreview.jpg");
     }
 
-    public Document buildScenePreviewXML() {
-
-        try {
-            Action actionImpl = new ActionImpl("startup", ActionImpl.Autorun.NONE, false);
-            actionImpl.addActionContent("if(startscene === null, copy(startscene,scene[0].name));");
-            actionImpl.addActionContent("loadscene(get(startscene), null, MERGE);");
-            Include include = new IncludeImpl("%SWFPATH%/../skin/vtourskin.xml");
-            TourXMLBuilder builder = new TourXMLBuilder("1.18", "Virtual Tour", "startup();");
-
-            builder.add(actionImpl);
-            builder.add(include);
-
-            SettingsSkin settingsSkin = new SettingsSkin();
-            settingsSkin.addElement("bingmaps", "true");
-            settingsSkin.addElement("bingmaps_key", TourProject.getInstance().getBingMapsKey());
-            settingsSkin.addElement("bingmaps_zoombuttons", "false");
-            settingsSkin.addElement("thumbs_width", "120");
-            settingsSkin.addElement("thumbs_height", "80");
-            settingsSkin.addElement("thumbs_padding", "10");
-            settingsSkin.addElement("thumbs_crop", "0|40|240|160");
-            settingsSkin.addElement("thumbs_opened", "false");
-            settingsSkin.addElement("thumbs_text", "true");
-            settingsSkin.addElement("thumbs_dragging", "true");
-            settingsSkin.addElement("thumbs_onhoverscrolling", "false");
-            settingsSkin.addElement("thumbs_scrollbuttons", "false");
-            settingsSkin.addElement("thumbs_scrollindicator", "false");
-            settingsSkin.addElement("thumbs_loop", "false");
-            settingsSkin.addElement("tooltips_thumbs", "false");
-            settingsSkin.addElement("tooltips_hotspots", "true");
-            settingsSkin.addElement("tooltips_mapspots", "false");
-            settingsSkin.addElement("controlbar_offset", "0");
-            builder.add(settingsSkin);
-
-
-            builder.add(scene);
-
-            return builder.build();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+    public void preview() {
+        try (BufferedWriter writerHTML = new BufferedWriter(new FileWriter(TourProject.getInstance().getTempFolder().getPath() + "/krpano.html"))) {
+            this.updateSceneFromPano();
+            writerHTML.write(SceneTemplates.htmlPreview);
+            TourInfoFactory.getTourMarshaller()
+                    .marshal(TourInfoFactory.buildSceneInfo(this), new File(TourProject.getInstance().getTempFolder().getPath() + "/krpano.xml"));
+            Desktop.getDesktop().open(new File(TourProject.getInstance().getTempFolder().getPath() + "/krpano.html"));
+        } catch (IOException | JAXBException e) {
+            logger.error(e);
         }
-        return null;
     }
 
-    private String addThumbPano() throws IOException {
+    public String addThumbPano() throws IOException {
         BufferedImage thumb = ImageIO.read(panoRaw.thumb);
         String thumbPath = TourProject.getInstance().getProjectFolder().getPath() + "/tiles/" + tilesFolderString + "thumb.jpg";
         ImageConverter.writeJPG(thumb, new File(thumbPath));
@@ -319,11 +287,17 @@ public class Pano implements Serializable {
         ImageConverter.writeJPG(preview, editorPreview);
     }
 
-    private ImagePano addPano(int tileSize) {
 
+    public ImageInfo addPano() {
+        return addPano(TILESIZE_DEFAULT);
+    }
 
-        ImagePano image = null;
+    public String getTilesFolderString() {
+        return tilesFolderString;
+    }
 
+    private ImageInfo addPano(int tileSize) {
+        ImageInfo image = null;
 
         try {
             BufferedImage previewImage = new BufferedImage(256, 1536, BufferedImage.TYPE_3BYTE_BGR);
@@ -332,13 +306,13 @@ public class Pano implements Serializable {
 
             // boolean imageXMLComplete = false;
             ExecutorService es = Executors.newFixedThreadPool(6);
-            Set<Callable<ImagePano>> callables = new HashSet<>();
+            Set<Callable<ImageInfo>> callables = new HashSet<>();
             for (File side : panoRaw.sides) {
                 callables.add(new CubeLevelsGenerator(tilesFolderString, side, previewGraphics, tileSize));
             }
             try {
-                List<Future<ImagePano>> list = es.invokeAll(callables);
-                for (Future<ImagePano> future : list) {
+                List<Future<ImageInfo>> list = es.invokeAll(callables);
+                for (Future<ImageInfo> future : list) {
 
                     image = future.get();
                     break;
@@ -346,7 +320,7 @@ public class Pano implements Serializable {
                 es.shutdown();
 
             } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
 
             ImageConverter.writeJPG(previewImage, new File(TourProject.getInstance().getProjectFolder().getPath() + "/tiles/" + tilesFolderString + "preview.jpg"));
@@ -357,18 +331,15 @@ public class Pano implements Serializable {
             addEditorPreview();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
 
         return image;
     }
 
+
     public void updateSceneFromPano() {
-        scene.getView().setFov(fov);
-        scene.getView().setHlookat(hlookat);
-        scene.getView().setVlookat(vlookat);
-        scene.setCoordinates(lng, lat, heading);
-        scene.setTitle(name);
+        this.sceneInfo = TourInfoFactory.buildSceneInfo(this);
     }
 
     public void clear() {
@@ -378,7 +349,7 @@ public class Pano implements Serializable {
             try {
                 FileUtils.deleteDirectory(tiles.toPath());
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
     }
@@ -391,7 +362,7 @@ public class Pano implements Serializable {
         this.uploaded = uploaded;
     }
 
-    private class CubeLevelsGenerator implements Callable<ImagePano> {
+    private class CubeLevelsGenerator implements Callable<ImageInfo> {
 
         BufferedImage resizedSideImage = null;
         String tilesFolder;
@@ -409,13 +380,15 @@ public class Pano implements Serializable {
 
 
         @Override
-        public ImagePano call() throws Exception {
-            ImagePano image = new ImageImpl(ImagePano.ImageType.CUBE, true);
-            image.setProgressive(true);
-            image.setTilesize(tileSize);
-            ImageLevelMobile mobile = new ImageLevelMobile();
-            mobile.addImageElement(new ImageElementImpl("cube", "%SWFPATH%/../tiles/" + tilesFolder + "mobile_%s.jpg"));
-            image.addLevel(mobile);
+        public ImageInfo call() throws Exception {
+            ImageInfo image = new ImageInfo();
+            image.type = ImageType.CUBE;
+            image.multires = true;
+            image.progressive = true;
+            image.tilesize = tileSize;
+            ImageLevelInfo mobile = new ImageLevelInfo();
+            mobile.imageElement = new CubeImageElementInfo("%SWFPATH%/../tiles/" + tilesFolder + "mobile_%s.jpg");
+            image.addMobileLevel(mobile);
 
             String sideName = Character.toString(side.getName().charAt(0));
             int sizeLevel = 1;
@@ -425,14 +398,15 @@ public class Pano implements Serializable {
             while (resizedWidth <= 3100) {
                 System.out.println("processing " + side.getName() + " " + resizedSideImage.getHeight() + " " + resizedSideImage.getWidth());
 
-                ImageLevel level = new ImageLevel(resizedWidth, resizedWidth);
+                ImageLevelInfo level = new ImageLevelInfo();
+                level.tiledimageheight = resizedWidth;
+                level.tiledimagewidth = resizedWidth;
                 //mask format "tiles/Pano.tif.tiles/%s/l3/%v/l3_%s_%v_%h.jpg"
                 String maskImagePath = "%SWFPATH%/../tiles/" + tilesFolder + "%s/l" + sizeLevel + "/%v/l" + sizeLevel + "_%s_%v_%h.jpg";
-                level.addImageElement(new ImageElementImpl("cube", maskImagePath));
+                level.imageElement = new CubeImageElementInfo(maskImagePath);
                 image.addLevel(level);
 
-
-                for (int i = 0; i < resizedSideImage.getHeight(); i += tileSize)
+                for (int i = 0; i < resizedSideImage.getHeight(); i += tileSize) {
                     for (int j = 0; j < resizedSideImage.getWidth(); j += tileSize) {
 
                         //System.out.println("i = " + i + "j = " + j);
@@ -451,6 +425,7 @@ public class Pano implements Serializable {
                             e.printStackTrace();
                         }
                     }
+                }
 
                 if (sizeLevel == 2) {
                     File outputMobileTile = new File(TourProject.getInstance().getProjectFolder().getPath() + "/tiles/" + tilesFolder + "mobile_" + sideName + ".jpg");
@@ -459,8 +434,9 @@ public class Pano implements Serializable {
 
                 resizedWidth *= 2;
 
-                if (sizeLevel < 3)
+                if (sizeLevel < 3) {
                     resizedSideImage = Thumbnails.of(side).size(resizedWidth, resizedWidth).antialiasing(Antialiasing.ON).resizer(new BicubicResizer()).asBufferedImage();
+                }
                 sizeLevel++;
 
             }

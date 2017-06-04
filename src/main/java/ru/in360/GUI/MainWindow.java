@@ -37,7 +37,9 @@
 
 package ru.in360.GUI;
 
+import org.apache.log4j.Logger;
 import ru.in360.SceneTemplates;
+import ru.in360.TourInfoFactory;
 import ru.in360.TourProject;
 import ru.in360.XMLTools;
 import ru.in360.pano.Pano;
@@ -46,6 +48,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.transform.TransformerException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -87,6 +91,8 @@ public class MainWindow extends JFrame {
     private JButton settingsButton;
     private Pano selectedPano;
 
+    private final static Logger logger = Logger.getLogger(TourInfoFactory.class);
+
     private MainWindow() {
         this.setContentPane(mainPanel);
 
@@ -96,7 +102,7 @@ public class MainWindow extends JFrame {
             public void windowClosing(WindowEvent e) {
                 super.windowClosing(e);
                 if (TourProject.getInstance().getProjectName() != null) {
-                    int dialogResult = JOptionPane.showConfirmDialog(null, "Would You Like to Save project?", "Warning", JOptionPane.YES_NO_OPTION);
+                    int dialogResult = JOptionPane.showConfirmDialog(null, "Would you like to save project?", "Warning", JOptionPane.YES_NO_OPTION);
                     if (dialogResult == JOptionPane.YES_OPTION) {
                         TourProject.getInstance().saveProject();
                     }
@@ -308,17 +314,10 @@ public class MainWindow extends JFrame {
 
     private void onPreview() {
 
-        if (selectedPano != null)
-            try (BufferedWriter writerHTML = new BufferedWriter(new FileWriter(project.getTempFolder().getPath() + "/krpano.html"))) {
-                selectedPano.updateSceneFromPano();
-                writerHTML.write(SceneTemplates.htmlPreview);
-                XMLTools.writeDOM(selectedPano.buildScenePreviewXML(), new File(TourProject.getInstance().getTempFolder().getPath() + "/krpano.xml"));
-                Desktop.getDesktop().open(new File(project.getTempFolder().getPath() + "/krpano.html"));
-            } catch (TransformerException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (selectedPano != null){
+            selectedPano.preview();
+        }
+
     }
 
     private void displaySelectedPano(Pano pano) {

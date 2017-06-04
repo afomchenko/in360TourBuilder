@@ -74,6 +74,7 @@ package ru.in360.beans;
 
 import ru.in360.constants.FOVType;
 import ru.in360.constants.LimitView;
+import ru.in360.pano.Pano;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -99,12 +100,13 @@ public class ViewInfo {
         fovmax = 120D;
     }
 
-    public ViewInfo(double hlookat, double vlookat, double fov) {
+    public ViewInfo(Pano pano) {
         this();
-        this.hlookat = hlookat;
-        this.vlookat = vlookat;
-        this.fov = fov;
+        this.hlookat = pano.getHlookat();
+        this.vlookat = pano.getVlookat();
+        this.fov = pano.getFov();
     }
+
 
     @XmlAttribute
     public double getHlookat() {
