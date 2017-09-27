@@ -1,5 +1,11 @@
 /*
  * This file is part of in360TourBuilder.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ * 27.09.17 14:12 Anton Fomchenko 360@in360.ru
+ *//*
+ * This file is part of in360TourBuilder.
  *
  *     in360TourBuilder is free software: you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -32,9 +38,7 @@
  *    <http://www.gnu.org/licenses/>.
  *
  * 29.10.16 1:08 Anton Fomchenko 360@in360.ru
- */
-
-/*
+ *//*
  * This file is part of in360TourBuilder.
  *
  *     in360TourBuilder is free software: you can redistribute it and/or modify
